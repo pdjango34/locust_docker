@@ -49,6 +49,9 @@ jobs:
         sudo chmod +x /usr/local/bin/docker-compose
         docker-compose --version  # Verify the installation
 
+    - name: Set executable permissions for entry_point.sh
+      run: |
+        chmod +x ./entry_point.sh  # Adjust the path as necessary
 
     - name: Set up Docker
       run: |
@@ -59,9 +62,13 @@ jobs:
         # Check the running containers
         docker-compose ps
 
+    - name: Check Locust Container Logs
+      run: |
+        docker-compose logs locust-container
+
     - name: Run Pytest inside Docker
       run: |
-        docker-compose exec -T my-locust-image pytest
+        docker exec locust-container pytest
 
     - name: Shut down Docker containers
       run: |
