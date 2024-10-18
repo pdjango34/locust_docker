@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+  locust:
+    image: my-locust-image
+    container_name: locust-container
+    build:
+      context: .
+    ports:
+      - "8089:8089"
+    volumes:
+      - .:/locust
+    command: >
+      locust
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    depends_on:
+      - mysql      
+    stdin_open: true  # Allows for interactive input
+    tty: true 
+
+volumes:
+  db_data:
